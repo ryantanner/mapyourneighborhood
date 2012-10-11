@@ -1,0 +1,48 @@
+@(message: String, mapForm: Form[String])
+
+@import helper._
+@import MyHelpers._
+
+@main("Map Your Neighborhood") {
+    
+    <div class="container">
+
+      <!-- Main hero unit for a primary marketing message or call to action -->
+      <div class="hero-unit row-fluid">
+        <h1>Ever though about your neighborhood?</h1>
+        <p>Give us your ideas on how the neighborhoods around you are drawn and see what others think about your city.</p>
+        @form(action = routes.Application.map, 'class -> "form-inline") {
+          @inputText(mapForm("location"), 'placeholder -> "What's your city?", 'label -> "&nbsp;")
+          <button class="btn btn-primary btn-large">Map it! &raquo;</button>
+        }
+      </div>
+
+      <!-- Example row of columns -->
+      <div class="row">
+        <div class="span4">
+          <h2>Heading</h2>
+          <p>This will be what it looks like to draw a polygon.</p>
+          <p><a class="btn" href="#">View details &raquo;</a></p>
+        </div>
+        <div class="span4">
+          <h2>Heading</h2>
+          <p>This is what it looks like to compare different users' opinions on a city.</p>
+          <p><a class="btn" href="#">View details &raquo;</a></p>
+       </div>
+        <div class="span4">
+          <h2>Heading</h2>
+          <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+          <p><a class="btn" href="#">View details &raquo;</a></p>
+        </div>
+      </div>
+
+      <hr>
+
+      <footer>
+        <p>&copy; Company 2012</p>
+      </footer>
+
+    </div> <!-- /container -->
+
+    
+} 

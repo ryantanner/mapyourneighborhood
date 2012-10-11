@@ -1,0 +1,62 @@
+Demo of polygon functionality
+http://www.the-di-lab.com/polygon/
+
+Requirements
+------------
+Click to add next vertex of polygon
+Click on existing vertex to split in two
+Drag endpoints to move polygon
+Polygon must close to define neighborhood
+When polygon is closed, prompt for name
+
+Handling ambiguous areas?
+
+Display all in region
+Display all with/similar to $name
+
+How to handle non-road borders like Allen Pkwy?
+
+Find a way to "snap" borders to roadways/political boundaries/what else?
+  Different drawing modes?
+    Free form, snap-to-road, 
+
+
+Front end
+---------
+Edit polygons
+
+Back end
+--------
+How to post polygon coordinates back to the server?
+  Post list of coordinates, parse on server-side
+  Create polygon on server, post individual coordinates
+    How to maintain order?
+  Serialize to GeoJSON format, post, deserialize on server
+
+Tech
+----
+  GeoJSON for storing polygons  http://geojson.org/
+  Scalaz geo package?
+  Leaflet, JS mapping library   http://leaflet.cloudmade.com/examples/geojson.html
+    leaflet.draw plugin
+      Will require modifications for editing existing polygons
+  Databases
+  ---------
+    PostGIS
+    MongoDB
+    CouchDB w/ GeoCouch w/ CouchApp   https://github.com/maxogden/geocouch-utils
+
+Which JS framework?
+-------------------
+  Backbone.js -- simple, allows for custom persistance
+
+Resources
+---------
+  http://boomphisto.blogspot.com/2011/10/serving-up-geojson-while-having-rest-on.html
+
+
+Implementation
+--------------
+Define REST API
+Write REST Unit Tests
+Define storage schema/reqs

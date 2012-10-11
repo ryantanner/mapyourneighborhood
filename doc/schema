@@ -1,0 +1,9 @@
+CITY
+  name
+  uace (id number)
+  uid
+
+NEIGHBORHOOD_SUBMISSION
+  name
+  polygon
+  user_id

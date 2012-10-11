@@ -1,0 +1,48 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                           controllers.Application.index
+
+# User Management
+
+GET     /login                      controllers.Application.login
+POST    /login                      controllers.Application.authenticate
+GET     /logout                     controllers.Application.logout
+
+GET     /map                        controllers.Application.map
+
+############
+# REST API #
+############
+
+# Get cities
+GET     /cities                     controllers.Cities.listAll
+GET     /cities/$uace<\d{5}>        controllers.Cities.single(uace: Int)
+
+# Get with alias
+#GET     /cities/:city               controllers.Cities.alias(city: String)
+
+# Create new city
+# POST    /cities                     controllers.Cities.create
+# Not needed, cities will be created from source
+
+
+# Get all neighborhoods for a city
+GET     /cities/$uace<\d{5}>/neighborhoods  controllers.Neighborhoods.listAll(uace: Int)
+#GET     /cities/:city/neighborhoods         controllers.Neighborhoods.listAll(city: String)
+
+# Get a neighboorhood for a city
+GET     /cities/$uace<\d{5}>/neighborhoods/:neighborhood   controllers.Neighborhoods.single(uace: Int, neighborhood: String)
+## How to normalize/alias neighborhood names?  Official source?
+
+# Create a neighborhood for a city
+POST    /cities/$uace<\d{5}>/neighborhoods   controllers.Neighborhoods.create(uace: Int)
+
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)
+
+GET     /webjars/*file                    controllers.WebJarAssets.at(file)
+

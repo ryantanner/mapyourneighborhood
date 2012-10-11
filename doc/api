@@ -1,0 +1,8 @@
+ROUTES
+
+/user
+/city
+/city/$CITY/neighborhood
+
+VERB  ROUTE                   PARAM
+GET   /user
