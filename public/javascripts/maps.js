@@ -1,6 +1,19 @@
 $(document).ready(function ($) {
 
-  var map = L.map('map').setView([51.505, -0.09], 13);
+  // get coords, call initializeMap in callback
+  $.getJSON("/city/" + App.cityName + "/coordinates", function(data) {
+
+    App.cityCenter = data.coordinates;
+
+    initializeMap();
+
+  }); 
+
+});
+
+function initializeMap() {
+
+  var map = L.map('map').setView(App.cityCenter, 13);
 
   // efcec85fc3ea4929a28650f4abceb6f9
   
@@ -31,4 +44,4 @@ $(document).ready(function ($) {
   });
   map.addLayer(drawnItems);
 
-});
+}

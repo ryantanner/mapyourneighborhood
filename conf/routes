@@ -13,6 +13,12 @@ GET     /logout                     controllers.Application.logout
 
 GET     /map                        controllers.Application.map
 
+GET     /city/:cityName             controllers.Neighborhoods.city(cityName: String)
+
+GET     /city/:cityName/coordinates controllers.Cities.coordinates(cityName: String)
+
+GET     /api/city/:cityName         controllers.Cities.city(cityName: String)
+
 ############
 # REST API #
 ############
