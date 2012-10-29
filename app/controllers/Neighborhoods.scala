@@ -18,7 +18,7 @@ object Neighborhoods extends Controller {
     }
   }
 
-  def single(uace: Int, neighborhood: String) = Action {
+  def single(uace: Int, id: Long) = Action {
     NotImplemented
   }
 

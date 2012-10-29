@@ -17,6 +17,12 @@ object Cities extends Controller {
     NotImplemented
   }
 
+  def resolveName(cityName: String) = Action {
+    NotImplemented
+  }
+
+  // Not yet transitioned to API...
+
   def byName(cityName: String) = Action {
     City.cityByName(cityName) match {
       case Some(city) => Ok(views.html.map.city(city))

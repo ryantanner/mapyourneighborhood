@@ -5,11 +5,9 @@
 
 @main("Map Your Neighborhood") {
     
-    <div class="container">
-
       <!-- Main hero unit for a primary marketing message or call to action -->
-      <div class="hero-unit row-fluid">
-        <h1>Ever though about your neighborhood?</h1>
+      <div class="hero-unit">
+        <h1>Ever thought about your neighborhood?</h1>
         <p>Give us your ideas on how the neighborhoods around you are drawn and see what others think about your city.</p>
         @form(action = routes.Application.map, 'class -> "form-inline") {
           @inputText(mapForm("location"), 'placeholder -> "What's your city?", 'label -> "&nbsp;")
@@ -42,7 +40,4 @@
         <p>&copy; Company 2012</p>
       </footer>
 
-    </div> <!-- /container -->
-
-    
 } 
