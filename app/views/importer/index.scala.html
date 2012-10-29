@@ -1,61 +1,21 @@
-@()
+@(title: String)
 
-<!DOCTYPE html>
+@main(title) {
 
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <title>Map Your Neighborhood Data Importer</title>
-        <meta name="description" content="">
-        <meta name="author" content="">
-        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
-        <link rel="stylesheet" media="screen" href="@routes.WebJarAssets.at("bootstrap/2.1.1/css/bootstrap.min.css")">
+<div class="hero-unit">
 
-        <link rel="stylesheet" href="@routes.Assets.at("stylesheets/maps.css")" />
+  <h1>Upload Census Data!</h1>
 
-        <style type="text/css">
-          body {
-            padding-top: 60px;
-            padding-bottom: 40px;
-          }
-        </style>
+  @helper.form(action = routes.Importer.upload, 'enctype -> "multipart/form-data") {
+  
+    <input type="file" name="census-data">
 
-        <script src="@routes.WebJarAssets.at("jquery/1.8.2/jquery.min.js")"></script>
-        <script src="@routes.WebJarAssets.at("bootstrap/2.1.1/js/bootstrap.min.js")"></script>
-      
-    </head>
-    <body>
-      
-      <div class="container">
+      <p>
+        <input type="submit">
+      </p>
 
-        <div class="navbar navbar-fixed-top">
-          <div class="navbar-inner">
-            <div class="container">
-              <a class="brand" href="#">Data Importer</a>
-              <ul class="nav">
-              </ul>
-          </div>
-          </div>
-        </div>
+  }
 
-        <div class="hero-unit">
+</div>
 
-          <h1>Upload Census Data!</h1>
-
-          @helper.form(action = routes.Importer.upload, 'enctype -> "multipart/form-data") {
-          
-            <input type="file" name="census-data">
-
-              <p>
-                <input type="submit">
-              </p>
-
-          }
-
-        </div>
-
-      </div>
-
-    </body>
-</html>
-
+}

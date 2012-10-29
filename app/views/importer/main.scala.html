@@ -1,0 +1,49 @@
+@(title: String)(content: Html)
+
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>@title</title>
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
+        <link rel="stylesheet" media="screen" href="@routes.WebJarAssets.at("bootstrap/2.1.1/css/bootstrap.min.css")">
+
+        <link rel="stylesheet" href="@routes.Assets.at("stylesheets/maps.css")" />
+
+        <style type="text/css">
+          body {
+            padding-top: 60px;
+            padding-bottom: 40px;
+          }
+        </style>
+
+        <script src="@routes.WebJarAssets.at("jquery/1.8.2/jquery.min.js")"></script>
+        <script src="@routes.WebJarAssets.at("bootstrap/2.1.1/js/bootstrap.min.js")"></script>
+      
+    </head>
+    <body>
+      
+      <div class="container">
+
+        <div class="navbar navbar-fixed-top">
+          <div class="navbar-inner">
+            <div class="container">
+              <a class="brand" href="#">Data Importer</a>
+              <ul class="nav">
+              </ul>
+          </div>
+          </div>
+        </div>
+
+          @content
+
+        </div>
+
+      </div>
+
+    </body>
+</html>
+

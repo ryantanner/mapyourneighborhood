@@ -20,21 +20,41 @@ GET     /city/:cityName/coordinates controllers.Cities.coordinates(cityName: Str
 GET     /api/city/:cityName         controllers.Cities.city(cityName: String)
 
 ############
-# REST API #
-############
-
-GET     /api/city/$uace<\d{5}>      controllers.Cities.single(uace: Int)
-GET     /api/city/:cityName         controllers.Cities.resolveName(cityName: String)
-
-GET     /api/city/$uace<\d{5}>/neighborhoods      controllers.Neighborhoods.listAll(uace: Int)
-GET     /api/city/$uace<\d{5}>/neighborhoods/:id  controllers.Neighborhoods.single(uace: Int, id: Long)
-
-############
-# Importer #
+# IMPORTER #
 ############
 
 GET     /importer                   controllers.Importer.index
+
 POST    /importer/upload            controllers.Importer.upload
+
+
+############
+# REST API #
+############
+
+# Get cities
+GET     /cities                     controllers.Cities.listAll
+GET     /cities/$uace<\d{5}>        controllers.Cities.single(uace: Int)
+
+# Get with alias
+#GET     /cities/:city               controllers.Cities.alias(city: String)
+
+# Create new city
+# POST    /cities                     controllers.Cities.create
+# Not needed, cities will be created from source
+
+
+# Get all neighborhoods for a city
+GET     /cities/$uace<\d{5}>/neighborhoods  controllers.Neighborhoods.listAll(uace: Int)
+#GET     /cities/:city/neighborhoods         controllers.Neighborhoods.listAll(city: String)
+
+# Get a neighboorhood for a city
+GET     /cities/$uace<\d{5}>/neighborhoods/:neighborhood   controllers.Neighborhoods.single(uace: Int, neighborhood: Long)
+## How to normalize/alias neighborhood names?  Official source?
+
+# Create a neighborhood for a city
+POST    /cities/$uace<\d{5}>/neighborhoods   controllers.Neighborhoods.create(uace: Int)
+
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
