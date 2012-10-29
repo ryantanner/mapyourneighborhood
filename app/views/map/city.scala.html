@@ -1,0 +1,34 @@
+@(city: City)
+
+@main("Map Your Neighborhood") {
+
+  <div class="container-fluid">
+    <div class="row-fluid">
+      <div class="span2 border-radius"> <!-- sidebar -->
+        Here be sidebar
+      </div>
+
+      <div class="span10"> <!-- map -->
+
+        <div id="map" 
+             data-cityName="@city.name" 
+             data-cityId="@city.id">
+          Map goes here eventually
+        </div>
+
+        <h2>Neighborhoods of @city.name</h2>
+
+        <dl>
+          @for(neighborhood <- city.neighborhoods) {
+            <dt>@neighborhood.name</dt>
+            <dd>@neighborhood.description</dt>
+          }
+        </dl>
+
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="@routes.Assets.at("javascripts/maps.js")"></script>
+
+}
