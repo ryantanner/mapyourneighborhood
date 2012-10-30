@@ -6,16 +6,79 @@
 
   <h1>Upload Census Data!</h1>
 
-  @helper.form(action = routes.Importer.upload, 'enctype -> "multipart/form-data") {
-  
-    <input type="file" name="census-data">
+  <p>
+  This tool will let you upload US Census data into MapYourNeighborhood.  Use the data from <a href="http://www.census.gov/geo/www/ua/ualists_layout.html">here</a>.
+  </p>
+
+  <p>
+    @helper.form(action = routes.Importer.upload, 
+                 'enctype -> "multipart/form-data", 
+                 'id -> "frmUpload",
+                 'target -> "ifrProgress") {
+    
+      <input type="file" id="fileCensus" name="census-data" class="hidden">
+      <div class="input-append">
+        <input id="txtCensusFile" class="input-large" type="text">
+        <a class="btn" onclick="$('input[id=fileCensus]').click();">Browse</a>
+      </div>
+
+      <script type="text/javascript">
+        $('input[id=fileCensus]').change(function () {
+          $('#txtCensusFile').val($(this).val());
+        });
+      </script>
 
       <p>
-        <input type="submit">
+        <input type="submit" class="btn btn-primary">
       </p>
 
-  }
+    }
+  </p>
+
+  <iframe id="ifrProgress" class="hidden">
+    <script type="text/javascript">
+      var data = {};
+    </script>
+  </iframe>
+
+  <script type="text/javascript">
+    function addEntryToTable(newEntry)  {
+      var json = $.parseJSON(newEntry);
+      var $tbl = $('#tblProgress');
+      var $tbody = $('tbody', $tbl);
+
+      var $tr = $('<tr/>');
+      var tblCells = [];
+
+      tblCells.push($('<td/>').html(json['uace']));
+      tblCells.push($('<td/>').html(json['name']));
+      tblCells.push($('<td/>').html(json['pop']));
+      tblCells.push($('<td/>').html(json['hu']));
+      tblCells.push($('<td/>').html(json['arealandsqmi']));
+
+      for (var $td in tblCells) {
+        $tr.append(tblCells[$td]);
+      }
+
+      $tbody.append($tr);
+      $tbl.removeClass('hidden');
+    }
+  </script>
 
 </div>
+
+<table id="tblProgress" class="table table-condensed hidden">
+  <thead>
+    <tr>
+      <th>UACE</th>
+      <th>Name</th>
+      <th>Population</th>
+      <th>Housing Unit Count</th>
+      <th>Land Area (sq. mi.)</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
 
 }
