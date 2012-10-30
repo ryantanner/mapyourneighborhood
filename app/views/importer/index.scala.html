@@ -18,21 +18,20 @@
     
       <input type="file" id="fileCensus" name="census-data" class="hidden">
       <div class="input-append">
-        <input id="txtCensusFile" class="input-large" type="text">
-        <a class="btn" onclick="$('input[id=fileCensus]').click();">Browse</a>
+        <input id="txtFileCensus" class="input-large" type="text">
+        <a class="btn" id="aFakeFileBtn">Browse</a>
       </div>
-
-      <script type="text/javascript">
-        $('input[id=fileCensus]').change(function () {
-          $('#txtCensusFile').val($(this).val());
-        });
-      </script>
 
       <p>
         <input type="submit" class="btn btn-primary">
       </p>
 
     }
+    
+    <div id="divProgress" class="hidden" style="height:0;">
+      <h5>Processing <span id="spNumItems">0</span> items.</h5>
+    </div>
+
   </p>
 
   <iframe id="ifrProgress" class="hidden">
@@ -42,6 +41,34 @@
   </iframe>
 
   <script type="text/javascript">
+    $(document).ready(function () {
+      // Set up fake file button events
+      $('#aFakeFileBtn').on('click', function(event) {
+        $('input[id=fileCensus]').click();
+      });
+
+      $('input[id=fileCensus]').change(function () {
+        $('#txtFileCensus').val($(this).val());
+      });
+
+      // Handle submit behavior to show progress indicators
+      $('#frmUpload').on('submit', function(event) {
+        // Disable form submission button
+        $('input[type=submit]', this).attr('disabled','disabled');
+
+        // Show progress counter
+        $('#frmUpload').slideUp('fast', function () {
+          $('#divProgress').removeClass('hidden').slideDown('fast');
+        });
+
+        // Show progress table
+        $('#tblProgress').removeClass('hidden');
+      });
+
+      numItems = 0;
+      $spNumItems = $('#spNumItems');
+    });
+
     function addEntryToTable(newEntry)  {
       var json = $.parseJSON(newEntry);
       var $tbl = $('#tblProgress');
@@ -61,7 +88,8 @@
       }
 
       $tbody.append($tr);
-      $tbl.removeClass('hidden');
+
+      $spNumItems.html(++numItems);
     }
   </script>
 
