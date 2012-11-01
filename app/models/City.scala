@@ -1,38 +1,108 @@
 package models
 
+import anorm._
+import anorm.SqlParser._
+import play.api.db._
 import play.api.libs.json._
+import play.api.Play.current
+
+import java.math.BigDecimal
 
 case class City(
-  id: Long,
+  id: Pk[Long] = NotAssigned,
+  uace: Int,
   name: String,
-  neighborhoods: Set[Neighborhood],
-  center: CoordinatePair
+  population: Int,
+  populationDensity: Double,
+  latitude: BigDecimal,
+  longitude: BigDecimal
 )
 
 object City {
 
-  val sampleCity = City(01L, "Houston", Neighborhood.neighborhoods, CoordinatePair(01L, 29.756032, -95.409445))
+  // Parse a single city
+  val simple = {
+    get[Pk[Long]]("city.id") ~
+    get[Int]("city.uace") ~
+    get[String]("city.name") ~
+    get[Int]("city.population") ~
+    get[Double]("city.population_density") ~
+    get[BigDecimal]("city.latitude") ~
+    get[BigDecimal]("city.longitude") map {
+      case id~uace~name~population~populationDensity~latitude~longitude =>
+        City(id, uace, name, population, populationDensity, latitude, longitude)
+    }
+  }
 
-  val cities = Map[String,City]("Houston" -> sampleCity)
+  // Retrieve by ID
+  def findById(id: Long): Option[City] = {
+    DB.withConnection { implicit connection =>
+      SQL("select * from cities where id = {id}").on('id -> id).as(City.simple.singleOpt)
+    }
+  }
 
-  def cityByName(cityName: String): Option[City] = cities.get(cityName)
+  // Retrieve by UACE
+  def findByUACE(uace: Long): Option[City] = {
+    DB.withConnection { implicit connection =>
+      SQL("select * from cities where uace = {uace}").on('uace -> uace).as(City.simple.singleOpt)
+    }
+  }
+
+  // Insert new city
+  def insert(city: City) = {
+    DB.withConnection { implicit connection =>
+      SQL(
+        """
+          insert into cities values (
+            (select next value for city_seq),
+            {uace}, {name}, {population}, {populationDensity}, {latitude}, {longitude}
+          )
+        """
+      ).on(
+        'uace -> city.uace,
+        'name -> city.name,
+        'population -> city.population,
+        'populationDensity -> city.populationDensity,
+        'latitude -> city.latitude,
+        'longitude -> city.longitude
+      ).executeUpdate()
+    }
+  }
 
   def toJson(city: City): JsValue = {
     import play.api.libs.json._
 
     Json.toJson(Map(
-      "id" -> Json.toJson(city.id),
-      "name" -> Json.toJson(city.name),
-      "coordinates" -> CoordinatePair.toJson(city.center),
-      "neighborhoods" -> Json.toJson(Seq(
+      "id" -> Json.toJson(city.id.getOrElse(0L)),
+      "uace" -> Json.toJson(city.uace),
+      "name" -> Json.toJson(city.name.replaceAll("'","&#39;")),
+      "population" -> Json.toJson(city.population),
+      "populationDensity" -> Json.toJson(city.populationDensity),
+      "latitude" -> Json.toJson(city.latitude.doubleValue),
+      "longitude" -> Json.toJson(city.longitude.doubleValue)
+/*      "neighborhoods" -> Json.toJson(Seq(
         city.neighborhoods map { neighborhood => Map(
           "id" -> Json.toJson(neighborhood.id),
           "name" -> Json.toJson(neighborhood.name),
           "description" -> Json.toJson(neighborhood.description),
           "coordinates" -> Json.toJson(neighborhood.coordinates.map(CoordinatePair.toJson))
         )}
-      ))
+      ))*/
     ))
   }
+
+  def fromCensus(censusItem: String): City = {
+    val item = censusItem.toList
+
+    City(
+      uace = item.slice(0,5).mkString.trim.toInt,
+      name = item.slice(10,70).mkString.trim,
+      population = item.slice(76,84).mkString.trim.toInt,
+      populationDensity = item.slice(170,178).mkString.trim.toDouble,
+      latitude = new BigDecimal(1.0),
+      longitude = new BigDecimal(1.0)
+    )
+  }
+    
 
 }

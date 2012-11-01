@@ -15,8 +15,8 @@ object Neighborhood {
 
   var neighborhoods = Set(
     Neighborhood(01L, "Montrose", "A cool place", 
-      Seq(CoordinatePair(01L, 29.756032, -95.409445), CoordinatePair(02L, 29.758119, -95.384382), 
-          CoordinatePair(03L, 29.738147, -95.410818), CoordinatePair(04L, 29.739042, -95.383696)))
+      Seq(CoordinatePair(29.756032, -95.409445), CoordinatePair(29.758119, -95.384382), 
+          CoordinatePair(29.738147, -95.410818), CoordinatePair(29.739042, -95.383696)))
 /*    Neighborhood(02L, "The Heights", "Good restaurants", 
       Seq(CoordinatePair(01L, "5", "8"), CoordinatePair(02L, "2", "0"))),
     Neighborhood(03L, "Downtown", "Noone goes here", 
@@ -31,7 +31,6 @@ object Neighborhood {
 
 
 case class CoordinatePair(
-  id: Long,
   lat: Double,
   lng: Double 
 )

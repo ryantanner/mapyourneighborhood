@@ -12,10 +12,13 @@ object Neighborhoods extends Controller {
   }
 
   def city(cityName: String) = Action {
+    NotImplemented
+    /*
     City.cityByName(cityName) match {
       case Some(city) => Ok(views.html.map.city(city))
       case None => NotFound("This city doesn't exist!")
     }
+    */
   }
 
   def single(uace: Int, id: Long) = Action {

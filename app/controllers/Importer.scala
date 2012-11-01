@@ -7,10 +7,13 @@ import play.api.libs.Comet
 import play.api.libs.Comet.CometMessage
 import play.api.templates.Html
 import play.api.libs.json._
+import play.api.libs.ws.WS
 
 import play.api.libs.concurrent._
-
+import play.api.Play.current
 import akka.util.duration._
+
+import models._
 
 object Importer extends Controller {
 
@@ -25,45 +28,76 @@ object Importer extends Controller {
 
       val filename = census.filename
       val contentType = census.contentType
+      val fileLength = census.ref.file.length
 
-      Ok.stream(Enumerator("Processing \"" + filename + "\"...").andThen(Enumerator.eof))
-
-      lazy val data = Enumerator.fromFile(census.ref.file, 192).map { item => 
-        Promise.timeout(Some(censusToJson(item.toList.map(_.toChar).mkString.trim)), 100 milliseconds)
+      val fileLengthMessage = Enumeratee.map[Long] { length =>
+        Html("""<script>parent.setTotalNumItems(""" + length + """);</script>""")
       }
 
-      val toCometMessage = Enumeratee.map[Promise[Some[JsValue]]] { data => data.value.fold( //{ value:Redeemed[Some[JsValue]] =>
-        onError => Html("ERROR"),
-        onSuceess => Html("""<script>parent.addEntryToTable('""" + data.value.get.get + """');</script>""")
+      val fileLengthEnumerator = Enumerator(fileLength/192)
+
+      //Ok.stream(Enumerator(fileLength/192).andThen(Enumerator.eof).through(fileLengthMessage))
+
+      /* First, post back to the client upon receipt, including basic info
+       * Second, post back when lat/long is recieved
+       * Third, post back upon successful DB insertion
+       * figure out how to indicate failure for the latter two
+       */
+
+      lazy val data = Enumerator.fromFile(census.ref.file, 192).map { item => 
+        Akka.future {
+          val city = City.fromCensus(item.toList.map(_.toChar).mkString.trim)
+          Some(City.toJson(city))
+        }
+      }
+
+
+        /*
+        Promise.timeout({item:Promise[Some[JsValue]] =>
+          // create City, insert into DB
+          val city = City.fromCensus(item.toList.map(_.toChar).mkString.trim)
+
+          City.insert(city)
+          // trigger an asynch akka actor to get lat/long for new city, update row
+
+          Some(City.toJson(city))
+          //Some(censusToJson(item.toList.map(_.toChar).mkString.trim))
+        }, 100 milliseconds)
+        */
+
+      //Promise.timeout(Some(censusToJson(item.toList.map(_.toChar).mkString.trim)), 100 milliseconds)
+
+      val toCometMessage = Enumeratee.map[NotWaiting[Some[JsValue]]] { data => data.fold( //{ value:Redeemed[Some[JsValue]] =>
+        onError => { Logger.error("Could not parse: " + data.get.get); Html("ERROR") },
+        onSuceess => Html("""<script>parent.addEntryToTable('""" + data.get.get + """');</script>""")
       )}
 
-      Ok.stream(data.andThen(Enumerator.eof).through(toCometMessage)) 
+      Ok.stream(Enumerator.interleave(
+        fileLengthEnumerator.andThen(Enumerator.eof).through(fileLengthMessage),
+        data.map(_.await(1000)).andThen(Enumerator.eof).through(toCometMessage)
+      )) 
     }.getOrElse{
       Redirect(routes.Importer.index).flashing(
         "error" -> "Missing file"
       )
     }
-  } 
-
-  private def censusToJson(censusItem: String): JsValue = {
-
-    val item = censusItem.toList
-  
-    Json.toJson(
-      Map(
-        "uace"          -> item.slice(0,5).mkString.trim,
-        "name"          -> item.slice(10,70).mkString.trim,
-        "pop"           -> item.slice(76,84).mkString.trim,
-        "hu"            -> item.slice(90,98).mkString.trim,
-        "arealand"      -> item.slice(104,117).mkString.trim,
-        "arealandsqmi"  -> item.slice(123,131).mkString.trim,
-        "areawater"     -> item.slice(137,150).mkString.trim,
-        "areawatersqmi" -> item.slice(156,164).mkString.trim,
-        "popden"        -> item.slice(170,178).mkString.trim,
-        "lsadc"         -> item.slice(183,185).mkString.trim
-      )
-    )
-
   }
+
+
+}
+
+object BingGeocoderWS   {
+
+/*  def geocode(state: String, locality: String): Promise[(String, String)] = {
+    
+  }
+  */
+
+  val apiKey = "Arys2Q3zd_PQaE8w9BUXvBY98oeeqg7L_DXoEv3hyk_Gfl_EyMFOgcU0mQNGySq7"
+
+  def URL(state: String, locality: String): String = 
+    "http://dev.virtualearth.net/REST/v1/Locations?countryRegion=US&"
+    + "adminDistrict=" + state + "&"
+    + "locality=" + locality + "&key=" + apiKey
 
 }

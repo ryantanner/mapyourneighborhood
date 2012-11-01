@@ -24,25 +24,31 @@ object Cities extends Controller {
   // Not yet transitioned to API...
 
   def byName(cityName: String) = Action {
+    NotImplemented
+    /*
     City.cityByName(cityName) match {
       case Some(city) => Ok(views.html.map.city(city))
       case None => NotFound("This city doesn't exist!")
-    }
+    }*/
   }
 
   def coordinates(cityName: String) = Action {
+    NotImplemented
+    /*
     City.cityByName(cityName) match {
       case Some(city) => Ok(Json.toJson(Map("city" -> Json.toJson(cityName),
                                             "coordinates" -> Json.toJson(Seq(city.center.lat, city.center.lng)))))
       case None => NotFound("This city doesn't exist!")
-    }
+    }*/
   }
 
   def city(cityName: String) = Action {
+    NotImplemented
+    /*
     City.cityByName(cityName) match {
       case Some(city) => Ok(City.toJson(city))
       case None => NotFound("City does not exist")
-    }
+    }*/
   }
     
 

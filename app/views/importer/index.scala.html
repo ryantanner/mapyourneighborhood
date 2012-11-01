@@ -29,16 +29,19 @@
     }
     
     <div id="divProgress" class="hidden" style="height:0;">
-      <h5>Processing <span id="spNumItems">0</span> items.</h5>
+      <h5>
+        Processing <span id="spNumItems">0</span> of 
+        <span id="spTotalItems"></span> items.
+      </h5>
+
+      <div class="progress progress-striped">
+        <div id="progressBar" class="bar" style="width: 0%;"></div>
+      </div>
     </div>
 
   </p>
 
-  <iframe id="ifrProgress" class="hidden">
-    <script type="text/javascript">
-      var data = {};
-    </script>
-  </iframe>
+  <iframe id="ifrProgress" class="hidden"></iframe>
 
   <script type="text/javascript">
     $(document).ready(function () {
@@ -66,34 +69,53 @@
       });
 
       numItems = 0;
+      totalNumItems = 0;
       $spNumItems = $('#spNumItems');
+      $tbl = $('#tblProgress');
+      $tbody = $('tbody', $tbl);
+      $progressBar = $('#progressBar');
     });
 
     function addEntryToTable(newEntry)  {
       var json = $.parseJSON(newEntry);
-      var $tbl = $('#tblProgress');
-      var $tbody = $('tbody', $tbl);
 
       var $tr = $('<tr/>');
+      $tr.attr('data-uace',json['uace']);
+
       var tblCells = [];
 
       tblCells.push($('<td/>').html(json['uace']));
       tblCells.push($('<td/>').html(json['name']));
-      tblCells.push($('<td/>').html(json['pop']));
-      tblCells.push($('<td/>').html(json['hu']));
-      tblCells.push($('<td/>').html(json['arealandsqmi']));
+      tblCells.push($('<td/>').html(json['population']));
+      tblCells.push($('<td/>').html(json['populationDensity']));
+      tblCells.push($('<td/>').addClass('geocoded'));
+      tblCells.push($('<td/>').addClass('saved'));
 
       for (var $td in tblCells) {
         $tr.append(tblCells[$td]);
       }
 
-      $tbody.append($tr);
+      $tbody.prepend($tr);
 
       $spNumItems.html(++numItems);
+      $progressBar.css('width',(numItems/totalNumItems)*100 + "%");
+    }
+
+    function markProgressRow(uace, task)   {
+      var $tr = $('[data-uace=' + uace + ']', $tbl);
+      var $td = $('.' + task, $tr).append($('<i/>').addClass('icon-ok'));
+    }
+
+    function setTotalNumItems(total)  {
+      totalNumItems = total;
+
+      $('#spTotalItems').html(totalNumItems);
     }
   </script>
 
 </div>
+
+<iframe src="@routes.Importer.geocodingProgress"></iframe>
 
 <table id="tblProgress" class="table table-condensed hidden">
   <thead>
@@ -101,8 +123,9 @@
       <th>UACE</th>
       <th>Name</th>
       <th>Population</th>
-      <th>Housing Unit Count</th>
-      <th>Land Area (sq. mi.)</th>
+      <th>Population Density</th>
+      <th>Geocoded</th>
+      <th>Saved</th>
     </tr>
   </thead>
   <tbody>

@@ -9,7 +9,8 @@ object ApplicationBuild extends Build {
 
     val appDependencies = Seq(
       "com.typesafe" % "slick_2.10.0-M7" % "0.11.1",
-      "org.webjars" % "bootstrap" % "2.1.1"
+      "org.webjars" % "bootstrap" % "2.1.1",
+      "org.webjars" % "backbonejs" % "0.9.2"
     )
 
     val dataImportSubProject = Project(
