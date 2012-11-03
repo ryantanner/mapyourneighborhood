@@ -1,3 +1,4 @@
+UACE      NAME                                                                 POP            HU             AREALAND        AREALANDSQMI       AREAWATER       AREAWATERSQMI POPDEN     LSADC
 00037     Abbeville, LA                                                        19824          8460           29222871         11.28             300497          0.12        1757.0     76     
 00064     Abbeville, SC                                                         5243          2578           11315197          4.37              19786          0.01        1200.1     76     
 00091     Abbotsford, WI                                                        3966          1616            5363441          2.07              13221          0.01        1915.2     76     

@@ -34,48 +34,57 @@ object Importer extends Controller {
         Html("""<script>parent.setTotalNumItems(""" + length + """);</script>""")
       }
 
-      val fileLengthEnumerator = Enumerator(fileLength/192)
+      val fileLengthEnumerator = Enumerator((fileLength-192)/192)
 
-      //Ok.stream(Enumerator(fileLength/192).andThen(Enumerator.eof).through(fileLengthMessage))
-
-      /* First, post back to the client upon receipt, including basic info
-       * Second, post back when lat/long is recieved
-       * Third, post back upon successful DB insertion
-       * figure out how to indicate failure for the latter two
-       */
-
-      lazy val data = Enumerator.fromFile(census.ref.file, 192).map { item => 
-        Akka.future {
-          val city = City.fromCensus(item.toList.map(_.toChar).mkString.trim)
-          Some(City.toJson(city))
-        }
+      val dropColumnNames: Enumeratee[Array[Byte], Array[Byte]] = {
+        Enumeratee.drop[Array[Byte]](1)
       }
 
+      val fileEnumerator = Enumerator.fromFile(census.ref.file, 192) through dropColumnNames 
 
-        /*
-        Promise.timeout({item:Promise[Some[JsValue]] =>
-          // create City, insert into DB
-          val city = City.fromCensus(item.toList.map(_.toChar).mkString.trim)
+      /*
+      val wsEnumerator = Enumerator.pushee[City] { onStart = pushee =>
+        // do something
+      }
 
-          City.insert(city)
-          // trigger an asynch akka actor to get lat/long for new city, update row
+      val dbEnumerator = Enumerator.pushee[City] { onStart = pushee =>
+        // do something
+      }
+      */
 
-          Some(City.toJson(city))
-          //Some(censusToJson(item.toList.map(_.toChar).mkString.trim))
-        }, 100 milliseconds)
-        */
+      val toCity: Enumeratee[Array[Byte], City] = Enumeratee.map[Array[Byte]] { arr => City.fromCensus(arr.map(_.toChar).mkString) }
 
-      //Promise.timeout(Some(censusToJson(item.toList.map(_.toChar).mkString.trim)), 100 milliseconds)
+      //val streamCities
 
-      val toCometMessage = Enumeratee.map[NotWaiting[Some[JsValue]]] { data => data.fold( //{ value:Redeemed[Some[JsValue]] =>
-        onError => { Logger.error("Could not parse: " + data.get.get); Html("ERROR") },
-        onSuceess => Html("""<script>parent.addEntryToTable('""" + data.get.get + """');</script>""")
-      )}
+      //fileEnumerator |>> toCity &>> streamCities
+      
 
+      // What does this need to do?
+      // Read the file line-by-line while skipping the first line
+      // Take each chunk, create a City from it
+      // Geocode each City using Bing's WS
+      // Insert each City into the DB
+      // Send the City back to the client as JSON
+
+      // Create three Enumerators, one for the file, one for the WS, one for the DB
+      // When a chunk is computed from one, it gets pushed into the next
+      // All three are interleaved in the stream
+
+      val cityEnumerator = fileEnumerator through toCity
+
+      
+      val cityToComet = Enumeratee.map[City] { city => 
+        Html("""<script>parent.addEntryToTable('""" + City.toJson(city) + """');</script>""")
+      }
+
+      Ok.stream(cityEnumerator.andThen(Enumerator.eof).through(cityToComet)) 
+
+      /*
       Ok.stream(Enumerator.interleave(
         fileLengthEnumerator.andThen(Enumerator.eof).through(fileLengthMessage),
         data.map(_.await(1000)).andThen(Enumerator.eof).through(toCometMessage)
       )) 
+      */
     }.getOrElse{
       Redirect(routes.Importer.index).flashing(
         "error" -> "Missing file"
@@ -96,8 +105,8 @@ object BingGeocoderWS   {
   val apiKey = "Arys2Q3zd_PQaE8w9BUXvBY98oeeqg7L_DXoEv3hyk_Gfl_EyMFOgcU0mQNGySq7"
 
   def URL(state: String, locality: String): String = 
-    "http://dev.virtualearth.net/REST/v1/Locations?countryRegion=US&"
-    + "adminDistrict=" + state + "&"
-    + "locality=" + locality + "&key=" + apiKey
+    "http://dev.virtualearth.net/REST/v1/Locations?countryRegion=US&" + 
+    "adminDistrict=" + state + "&" + 
+    "locality=" + locality + "&key=" + apiKey
 
 }
