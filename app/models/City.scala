@@ -12,6 +12,7 @@ case class City(
   id: Pk[Long] = NotAssigned,
   uace: Int,
   name: String,
+  state: String,
   population: Int,
   populationDensity: Double,
   latitude: BigDecimal,
@@ -25,12 +26,13 @@ object City {
     get[Pk[Long]]("city.id") ~
     get[Int]("city.uace") ~
     get[String]("city.name") ~
+    get[String]("city.state") ~
     get[Int]("city.population") ~
     get[Double]("city.population_density") ~
     get[BigDecimal]("city.latitude") ~
     get[BigDecimal]("city.longitude") map {
-      case id~uace~name~population~populationDensity~latitude~longitude =>
-        City(id, uace, name, population, populationDensity, latitude, longitude)
+      case id~uace~name~state~population~populationDensity~latitude~longitude =>
+        City(id, uace, name, state, population, populationDensity, latitude, longitude)
     }
   }
 
@@ -76,6 +78,7 @@ object City {
       "id" -> Json.toJson(city.id.getOrElse(0L)),
       "uace" -> Json.toJson(city.uace),
       "name" -> Json.toJson(city.name.replaceAll("'","&#39;")),
+      "state" -> Json.toJson(city.state),
       "population" -> Json.toJson(city.population),
       "populationDensity" -> Json.toJson(city.populationDensity),
       "latitude" -> Json.toJson(city.latitude.doubleValue),
@@ -94,9 +97,12 @@ object City {
   def fromCensus(censusItem: String): City = {
     val item = censusItem.toList
 
+    val name = item.slice(10,70).mkString.trim
+
     City(
       uace = item.slice(0,5).mkString.trim.toInt,
-      name = item.slice(10,70).mkString.trim,
+      name = name.split(",")(0),
+      state = name.split(",")(1),
       population = item.slice(76,84).mkString.trim.toInt,
       populationDensity = item.slice(170,178).mkString.trim.toDouble,
       latitude = new BigDecimal(1.0),

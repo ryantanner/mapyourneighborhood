@@ -27,6 +27,10 @@ GET     /importer                   controllers.Importer.index
 
 POST    /importer/upload            controllers.Importer.upload
 
+GET     /importer/geocodingProgress controllers.Importer.geocodingProgress
+
+GET     /importer/dbProgress        controllers.Importer.dbProgress
+
 ############
 # REST API #
 ############
